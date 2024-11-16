@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
+import { forwardRef, Module, NestModule } from "@nestjs/common";
 import { UserService } from "./user.service";
 import { AuthModule } from "@/modules/auth/auth.module";
 import { UserController } from "./user.controller";
@@ -11,7 +11,8 @@ import { MongodModule } from '../mongod.module';
     UserProvider,
     UserService
   ],
-  controllers: [UserController]
+  controllers: [UserController],
+  exports: [UserService, UserProvider]
 })
 
 export class UserModule {

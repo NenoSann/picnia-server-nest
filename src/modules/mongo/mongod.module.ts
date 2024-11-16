@@ -3,6 +3,6 @@ import { mongodProvider } from './mongod.provider';
 
 @Module({
   providers: [...mongodProvider],
-  exports: [...mongodProvider]
+  exports: [...mongodProvider],
 })
 export class MongodModule { }

@@ -17,7 +17,12 @@ export class ImageBucketService {
     })
   }
 
-  async storeImage(imageBuffer: Buffer, key: string) {
+  async storePostImage(imageBuffer: Buffer, postId: string, imageType: string) {
+    const key = `/image/${postId}.${imageType}`
+    return this.storeImage(imageBuffer, key)
+  }
+
+  async storeImage(imageBuffer: Buffer, key: string): Promise<COS.PutObjectResult> {
     return new Promise((resolve, reject) => {
       try {
         this.cos.putObject({

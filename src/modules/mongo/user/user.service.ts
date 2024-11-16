@@ -1,11 +1,9 @@
 import { Model } from 'mongoose'
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common'
-import { IUser } from './user.interface'
+import { IUser, PostListType } from './user.interface'
 import { AuthService } from '@/modules/auth/auth.service'
-import { ProviderConstants } from '@/config/constants'
 import { LoginUserDto, RegisterUserDto } from './dto';
 import { BcryptService } from '@/modules/auth/bcrypt.service'
-const { UserModel } = ProviderConstants;
 
 @Injectable()
 export class UserService {
@@ -16,7 +14,6 @@ export class UserService {
     private readonly authService: AuthService,
   ) { }
 
-  // Add your service methods here
   async login(credential: LoginUserDto): Promise<string> {
     try {
       const { email, password } = credential;
@@ -53,5 +50,25 @@ export class UserService {
     }
   }
 
+  getUserPostList(type: PostListType, targetUser: IUser) {
+    switch (type) {
+      case PostListType.like:
+        return targetUser.likeList
+      case PostListType.save:
+        return targetUser.saveList
+      case PostListType.own:
+        return targetUser.posts
+      default:
+        return []
+    }
+  }
 
+  getUploaderData(uploader: IUser) {
+    return {
+      userName: uploader.userName,
+      avatar: uploader.avatar,
+      userId: uploader._id,
+      email: uploader.email
+    }
+  }
 }
