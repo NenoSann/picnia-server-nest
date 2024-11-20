@@ -1,6 +1,6 @@
 import { Injectable, Inject, HttpException, HttpStatus, forwardRef } from '@nestjs/common';
 import { Model } from 'mongoose';
-import { IPost } from './post.interface';
+import { IPost } from './post.dto';
 import { IUser } from '../user/user.interface';
 import { UserService } from '../user/user.service';
 import { createPostDto, queryUserPostsDto as queryUserPostsByTypeDto } from './dto';
@@ -57,15 +57,42 @@ export class PostService {
       for (const postId of targetList) {
         const post = await this.postModel.findById(postId)
         if (post) {
-          postArray.push({
-            uploader: uploaderInfo,
-            post: this.getPostData(post),
-            isLiked: targetUser.likeList.includes(postId),
-            isSaved: targetUser.saveList.includes(postId)
-          })
+          postArray.push(this.getFullPostData(post, targetUser))
         }
       }
       return postArray
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+  }
+
+  async randomQuery(count: number, requestUserName: string) {
+    try {
+      const targetUser = await this.userModel.findOne({ userName: requestUserName })
+      if (!targetUser) {
+        throw new HttpException('user not found', HttpStatus.NOT_FOUND)
+      }
+      const postArray = []
+      const postList = await this.postModel.aggregate([{ $sample: { size: count } }])
+      for (const post of postList) {
+        postArray.push(this.getFullPostData(post, targetUser))
+      }
+      return postArray
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+  }
+
+  async deletePostById(postId: string) {
+    try {
+      const post = await this.postModel.findById(postId)
+      if (!post) {
+        throw new HttpException('post not found', HttpStatus.NOT_FOUND)
+      }
+      const author = await this.userModel.findById(post.author)
+      await post.deleteOne()
+      author.posts = author.posts.filter((id) => id !== postId)
+      await author.save()
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
     }
@@ -83,6 +110,15 @@ export class PostService {
       commentCounts: comments.length,
       postImage: image,
       postID: _id,
+    }
+  }
+
+  getFullPostData(post: IPost, user: IUser) {
+    return {
+      uploader: this.userService.getUploaderData(user),
+      post: this.getPostData(post),
+      isLike: user.likeList.includes(post._id as string),
+      isSaved: user.saveList.includes(post._id as string)
     }
   }
 }

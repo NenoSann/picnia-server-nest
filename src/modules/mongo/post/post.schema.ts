@@ -21,7 +21,7 @@ export const PostSchema = new mongoose.Schema({
   },
   comments: {
     type: [mongoose.Schema.Types.ObjectId],
-    default: undefined,
+    default: [],
   },
   likes: {
     type: mongoose.Schema.Types.Number,

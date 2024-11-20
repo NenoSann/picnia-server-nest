@@ -1,5 +1,6 @@
 import { Types } from "mongoose"
 import { PostListType } from "../../user/user.interface"
+import { IsEnum, IsNotEmpty, IsString } from "class-validator"
 
 export interface createPostDto {
   imageBuffer: Buffer
@@ -12,7 +13,10 @@ export interface createPostDto {
   comments?: string[]
 }
 
-export interface queryUserPostsDto {
+export class queryUserPostsDto {
+  @IsEnum(PostListType) @IsNotEmpty()
   type: PostListType
-  requestUserId: string | Types.ObjectId
+
+  @IsString() @IsNotEmpty()
+  requestUserId: string
 }

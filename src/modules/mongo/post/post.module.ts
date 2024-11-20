@@ -10,6 +10,6 @@ import { ImageBucketModule } from '@/modules/image-bucket/image-bucket.module';
   imports: [MongodModule, forwardRef(() => UserModule), ImageBucketModule],
   providers: [PostService, Post],
   controllers: [PostController],
-  exports: [PostService]
+  exports: [PostService, Post]
 })
 export class PostModule { }

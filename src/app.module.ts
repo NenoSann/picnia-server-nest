@@ -6,8 +6,9 @@ import { AuthService } from './modules/auth/auth.service';
 import { UserModule } from '@/modules/mongo/user/user.module';
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { PostModule } from './modules/mongo/post/post.module';
+import { CommentModule } from './modules/mongo/comment/comment.module';
 @Module({
-  imports: [UserModule, PostModule],
+  imports: [UserModule, PostModule, CommentModule],
   controllers: [AppController],
   providers: [AppService, AuthService]
 })

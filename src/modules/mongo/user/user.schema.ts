@@ -1,7 +1,8 @@
 import * as mongoose from 'mongoose'
+import { IUser } from './user.interface'
 const defaultAvatar = 'imagebucket-1322308688.cos.ap-tokyo.myqcloud.com/picnia/avatar/default/default.png'
 
-export const UserSchema = new mongoose.Schema({
+export const UserSchema = new mongoose.Schema<IUser>({
   userID: mongoose.Schema.Types.ObjectId,
   userName: {
     type: mongoose.Schema.Types.String,
@@ -26,7 +27,7 @@ export const UserSchema = new mongoose.Schema({
     default: 0,
   },
   posts: {
-    type: [mongoose.Schema.Types.ObjectId],
+    type: [mongoose.Schema.Types.String || mongoose.Schema.Types.ObjectId],
     default: undefined,
   },
   userBrief: {
@@ -34,11 +35,11 @@ export const UserSchema = new mongoose.Schema({
     default: undefined,
   },
   likeList: {
-    type: [mongoose.Schema.Types.ObjectId],
+    type: [mongoose.Schema.Types.ObjectId || mongoose.Schema.Types.String],
     default: undefined,
   },
   saveList: {
-    type: [mongoose.Schema.Types.ObjectId],
+    type: [mongoose.Schema.Types.ObjectId || mongoose.Schema.Types.String],
     default: undefined,
   },
   createDate: mongoose.Schema.Types.Date,

@@ -1,6 +1,7 @@
 // user.interface.ts
 
-import { Document } from "mongoose";
+import { Document, Types } from "mongoose";
+
 
 export interface IUser extends Document {
   userID: string;
@@ -9,10 +10,24 @@ export interface IUser extends Document {
   password: string;
   avatar?: string;
   avatar_v?: number;
-  posts?: string[];
+  posts?: Array<string | Types.ObjectId>;
   userBrief?: string;
-  likeList?: string[];
-  saveList?: string[];
+  likeList?: Array<string | Types.ObjectId>;
+  saveList?: Array<string | Types.ObjectId>;
+  createDate?: Date;
+}
+
+export interface UserDocument {
+  _id: string | {};
+  userName: string;
+  email: string;
+  password: string;
+  avatar?: string;
+  avatar_v?: number;
+  posts?: Array<string | Types.ObjectId>;
+  userBrief?: string;
+  likeList?: Array<string | Types.ObjectId>;
+  saveList?: Array<string | Types.ObjectId>;
   createDate?: Date;
 }
 
