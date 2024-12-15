@@ -1,11 +1,10 @@
 import { Injectable, Inject, HttpException, HttpStatus, forwardRef } from '@nestjs/common';
 import { Model } from 'mongoose';
 import { IPost } from './post.dto';
-import { IUser } from '../user/user.interface';
+import { IUser, PostListType } from '../user/user.interface';
 import { UserService } from '../user/user.service';
-import { createPostDto, queryUserPostsDto as queryUserPostsByTypeDto } from './dto';
+import { createPostDto, queryUserPostsDto as queryUserPostsByTypeDto, saveOrLikePostDto } from './dto';
 import { ImageBucketService } from '@/modules/image-bucket/image-bucket.service';
-
 @Injectable()
 export class PostService {
   constructor(
@@ -95,6 +94,47 @@ export class PostService {
       await author.save()
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+  }
+
+  async saveOrLikePost(saveOrLikePostDto: saveOrLikePostDto) {
+    try {
+      const { target, userName, postId } = saveOrLikePostDto
+      const targetUser = await this.userModel.findOne({ userName })
+      const targetPost = await this.postModel.findById(postId)
+      if (!targetUser || !targetPost) {
+        throw new HttpException('user or post not found', HttpStatus.NOT_FOUND)
+      }
+      let targetList;
+      let targetCount;
+
+      if (target === PostListType.like) {
+        targetList = targetUser.likeList;
+        targetCount = targetPost.likes;
+      } else if (target === PostListType.save) {
+        targetList = targetUser.saveList;
+        targetCount = targetPost.saves;
+      }
+
+      const targetIndex = targetList.indexOf(postId);
+      // if post is not exist
+      if (targetIndex === -1) {
+        targetList.push(postId);
+        targetCount++;
+      } else {
+        targetList.splice(targetIndex, 1);
+        targetCount--;
+      }
+
+      if (target === PostListType.like) {
+        targetPost.likes = targetCount;
+      } else if (target === PostListType.save) {
+        targetPost.saves = targetCount;
+      }
+      await targetUser.save();
+      await targetPost.save();
+    } catch (error) {
+
     }
   }
 

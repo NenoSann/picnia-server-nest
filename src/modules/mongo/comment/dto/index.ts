@@ -17,10 +17,10 @@ export class QueryCommentsDto {
   @IsString()
   postId: string
 
-  @IsNumber()
+  @IsString()
   count: number
 
-  @IsNumber()
+  @IsString()
   page: number
 }
 

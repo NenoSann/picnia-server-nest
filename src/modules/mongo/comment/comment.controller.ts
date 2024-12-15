@@ -1,4 +1,4 @@
-import { Body, Controller, forwardRef, Get, Post, Inject } from "@nestjs/common";
+import { Body, Controller, forwardRef, Get, Post, Inject, Query } from "@nestjs/common";
 import { CreateCommentsDto, QueryCommentsDto } from "./dto";
 import { CommentService } from "./comment.service";
 @Controller('comment')
@@ -18,7 +18,7 @@ export class CommentController {
   }
 
   @Get('get')
-  get(@Body() queryCommentsDto: QueryCommentsDto) {
+  get(@Query() queryCommentsDto: QueryCommentsDto) {
     console.log('queryCommentsDto ', queryCommentsDto)
     return this.commentService.queryPostComments(queryCommentsDto.postId)
   }

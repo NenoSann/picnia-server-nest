@@ -1,8 +1,8 @@
-import { Controller, Inject, UseInterceptors, UploadedFiles, Post, Get, Query, ValidationPipe } from '@nestjs/common';
+import { Controller, Inject, UseInterceptors, UploadedFiles, Post, Get, Query, ValidationPipe, Body } from '@nestjs/common';
 import { PostService } from './post.service';
 import { FileFieldsInterceptor } from '@nestjs/platform-express';
 
-import { queryUserPostsDto } from './dto';
+import { queryUserPostsDto, saveOrLikePostDto } from './dto';
 @Controller('post')
 export class PostController {
   constructor(
@@ -32,5 +32,10 @@ export class PostController {
   @Get('get')
   async getPost(@Query() query: queryUserPostsDto) {
     return this.postService.queryUserPostsByType(query);
+  }
+
+  @Post('/update/saveOrLikePost')
+  async saveOrLikePost(@Body() body: saveOrLikePostDto) {
+    return this.postService.saveOrLikePost(body);
   }
 }

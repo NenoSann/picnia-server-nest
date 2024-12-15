@@ -2,7 +2,7 @@ import { Model } from 'mongoose'
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common'
 import { IUser, PostListType } from './user.interface'
 import { AuthService } from '@/modules/auth/auth.service'
-import { LoginUserDto, RegisterUserDto } from './dto';
+import { GetUserProfileDto, LoginUserDto, RegisterUserDto } from './dto';
 import { BcryptService } from '@/modules/auth/bcrypt.service'
 
 @Injectable()
@@ -50,6 +50,19 @@ export class UserService {
     }
   }
 
+  async getUserProfileById(dto: GetUserProfileDto) {
+    try {
+      const { userName } = dto
+      const user = await this.userModel.findOne({ userName })
+      if (!user) {
+        throw new HttpException('user not found', HttpStatus.NOT_FOUND)
+      }
+      return this.getUserProfile(user)
+    } catch (error) {
+      throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+  }
+
   getUserPostList(type: PostListType, targetUser: IUser) {
     switch (type) {
       case PostListType.like:
@@ -69,6 +82,20 @@ export class UserService {
       avatar: uploader.avatar,
       userId: uploader._id,
       email: uploader.email
+    }
+  }
+
+  getUserProfile(user: IUser) {
+    const { _id, userName, avatar, email, userBrief, posts, likeList, saveList } = user
+    return {
+      userId: _id,
+      userName: userName,
+      avatar: avatar,
+      email: email,
+      userBrief: userBrief,
+      posts: posts,
+      likePosts: likeList,
+      savedPosts: saveList
     }
   }
 }
