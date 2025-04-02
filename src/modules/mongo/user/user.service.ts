@@ -1,6 +1,6 @@
 import { Model } from 'mongoose'
 import { Injectable, Inject, HttpException, HttpStatus } from '@nestjs/common'
-import { IUser, PostListType } from './user.interface'
+import { IUser, UserLoginResult, PostListType } from './user.interface'
 import { AuthService } from '@/modules/auth/auth.service'
 import { GetUserProfileDto, LoginUserDto, RegisterUserDto } from './dto';
 import { BcryptService } from '@/modules/auth/bcrypt.service'
@@ -14,7 +14,7 @@ export class UserService {
     private readonly authService: AuthService,
   ) { }
 
-  async login(credential: LoginUserDto): Promise<string> {
+  async login(credential: LoginUserDto): Promise<UserLoginResult> {
     try {
       const { email, password } = credential;
       const user = await this.userModel.findOne({ email })
@@ -29,13 +29,20 @@ export class UserService {
       }
       // generate token
       const token = this.authService.createJWT(user._id.toString())
-      return token
+      const { userName, avatar, email: userEmail, id } = user
+      return {
+        userName,
+        userID: id,
+        email: userEmail,
+        avatar,
+        token
+      }
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
 
-  async register(credential: RegisterUserDto): Promise<void> {
+  async register(credential: RegisterUserDto): Promise<IUser> {
     try {
       const { email, password, userName } = credential;
       const duplicatedName = await this.userModel.findOne({ userName })
@@ -45,6 +52,8 @@ export class UserService {
       }
       const hash = await this.bcryptService.hash(password)
       const user = new this.userModel({ email, password: hash, userName })
+      await user.save()
+      return user
     } catch (error) {
       throw new HttpException(error.message, HttpStatus.INTERNAL_SERVER_ERROR)
     }

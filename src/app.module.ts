@@ -7,10 +7,17 @@ import { UserModule } from '@/modules/mongo/user/user.module';
 import { LoggerMiddleware } from './middleware/logger.middleware';
 import { PostModule } from './modules/mongo/post/post.module';
 import { CommentModule } from './modules/mongo/comment/comment.module';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import ResponseWrapperInterceptor from './interceptor/responseWrapper.interceptor';
 @Module({
   imports: [UserModule, PostModule, CommentModule],
   controllers: [AppController],
-  providers: [AppService, AuthService]
+  providers: [AppService, AuthService,
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseWrapperInterceptor
+    }
+  ]
 })
 
 export class AppModule implements NestModule {
